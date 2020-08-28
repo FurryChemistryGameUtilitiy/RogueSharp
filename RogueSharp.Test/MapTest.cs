@@ -26,7 +26,7 @@ namespace RogueSharp.Test
       }
 
       [TestMethod]
-      public void Clear_IsTransparentTrueIsWalkableFalse_AllCellsHaveExpectedValues()
+      public void Clear_IsSightTransparentTrueIsWalkableFalse_AllCellsHaveExpectedValues()
       {
          Map map = new Map( 10, 10 );
 
@@ -34,7 +34,7 @@ namespace RogueSharp.Test
 
          foreach ( ICell cell in map.GetAllCells() )
          {
-            Assert.IsTrue( map.IsTransparent( cell.X, cell.Y ) );
+            Assert.IsTrue( map.IsSightTransparent( cell.X, cell.Y ) );
             Assert.IsFalse( map.IsWalkable( cell.X, cell.Y ) );
          }
       }
@@ -130,17 +130,17 @@ namespace RogueSharp.Test
 
          for ( int x = 0; x < map.Width; x++ )
          {
-            Assert.IsFalse( map.IsTransparent( x, 0 ) );
+            Assert.IsFalse( map.IsSightTransparent( x, 0 ) );
             Assert.IsFalse( map.IsWalkable( x, 0 ) );
-            Assert.IsFalse( map.IsTransparent( x, map.Height - 1 ) );
+            Assert.IsFalse( map.IsSightTransparent( x, map.Height - 1 ) );
             Assert.IsFalse( map.IsWalkable( x, map.Height - 1 ) );
          }
 
          for ( int y = 0; y < map.Height; y++ )
          {
-            Assert.IsFalse( map.IsTransparent( 0, y ) );
+            Assert.IsFalse( map.IsSightTransparent( 0, y ) );
             Assert.IsFalse( map.IsWalkable( 0, y ) );
-            Assert.IsFalse( map.IsTransparent( map.Width - 1, y ) );
+            Assert.IsFalse( map.IsSightTransparent( map.Width - 1, y ) );
             Assert.IsFalse( map.IsWalkable( map.Width - 1, y ) );
          }
       }

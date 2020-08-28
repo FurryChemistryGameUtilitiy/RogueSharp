@@ -8,7 +8,7 @@ namespace RogueSharp
    public interface ICell : IEquatable<ICell>
    {
       /// <summary>
-      /// Gets the X location of the Cell starting with 0 as the farthest left
+      /// X location of the Cell starting with 0 as the farthest left
       /// </summary>
       int X { get; set; }
 
@@ -18,6 +18,11 @@ namespace RogueSharp
       int Y { get; set; }
 
       /// <summary>
+      /// Location of the Cell with X starting with 0 as the farthest left and with Y starting with 0 as the top
+      /// </summary>
+      Point Location { get; set; }
+
+      /// <summary>
       /// Get the transparency of the Cell i.e. if line of sight would be blocked by this Cell
       /// </summary>
       /// <example>
@@ -25,7 +30,7 @@ namespace RogueSharp
       /// A Cell representing a glass wall could be transparent (even though it may not be walkable)
       /// A Cell representing a solid stone wall would not be transparent
       /// </example>
-      bool IsTransparent { get; set; }
+      bool IsSightTransparent { get; set; }
 
       /// <summary>
       /// Get the walkability of the Cell i.e. if a character could normally move across the Cell without difficulty

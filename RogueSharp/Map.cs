@@ -97,6 +97,17 @@ namespace RogueSharp
       /// <summary>
       /// This Indexer allows direct access to Cells given x and y index
       /// </summary>
+      /// <param name="location">X and Y index of the Cell to get</param>
+      /// <returns>Cell at the specified index</returns>
+      public TCell this[Point location]
+      {
+         get => _cells[location.X, location.Y];
+         set => _cells[location.X, location.Y] = value;
+      }
+
+      /// <summary>
+      /// This Indexer allows direct access to Cells given x and y index
+      /// </summary>
       /// <param name="x">X index of the Cell to get</param>
       /// <param name="y">Y index of the Cell to get</param>
       /// <returns>Cell at the specified index</returns>
@@ -167,12 +178,42 @@ namespace RogueSharp
       /// A Cell representing a glass wall could be transparent (even though it may not be walkable)
       /// A Cell representing a solid stone wall would not be transparent
       /// </example>
+      /// <param name="location">Location of the Cell to check, X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <returns>True if line-of-sight is not blocked by this Cell, false otherwise</returns>
+      public bool IsSightTransparent( Point location )
+      {
+         return _cells[location.X, location.Y].IsSightTransparent;
+      }
+
+      /// <summary>
+      /// Get the transparency of the Cell i.e. if line of sight would be blocked by this Cell
+      /// </summary>
+      /// <example>      
+      /// A Cell representing an empty stone floor would be transparent 
+      /// A Cell representing a glass wall could be transparent (even though it may not be walkable)
+      /// A Cell representing a solid stone wall would not be transparent
+      /// </example>
       /// <param name="x">X location of the Cell to check starting with 0 as the farthest left</param>
       /// <param name="y">Y location of the Cell to check, starting with 0 as the top</param>
       /// <returns>True if line-of-sight is not blocked by this Cell, false otherwise</returns>
-      public bool IsTransparent( int x, int y )
+      public bool IsSightTransparent( int x, int y )
       {
-         return _cells[x, y].IsTransparent;
+         return _cells[x, y].IsSightTransparent;
+      }
+
+      /// <summary>
+      /// Get the walkability of the Cell i.e. if a character could normally move across the Cell without difficulty
+      /// </summary>
+      /// <example>      
+      /// A Cell representing an empty stone floor would be walkable
+      /// A Cell representing a glass wall may not be walkable (even though it could be transparent)
+      /// A Cell representing a solid stone wall would not be walkable
+      /// </example>
+      /// <param name="location">Location of the Cell to check, X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <returns>True if a character could move across this Cell, false otherwise</returns>
+      public bool IsWalkable(Point location )
+      {
+         return IsWalkable( location.X, location.Y );
       }
 
       /// <summary>
@@ -194,13 +235,24 @@ namespace RogueSharp
       /// <summary>
       /// Set the properties of an unexplored Cell to the specified values
       /// </summary>
+      /// <param name="location">Location of the Cell to set properties on, X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <param name="isSightTransparent">True if line-of-sight is not blocked by this Cell. False otherwise</param>
+      /// <param name="isWalkable">True if a character could walk across the Cell normally. False otherwise</param>
+      public void SetCellProperties( Point location, bool isSightTransparent, bool isWalkable )
+      {
+         SetCellProperties( location.X, location.Y, isSightTransparent, isWalkable );
+      }
+
+      /// <summary>
+      /// Set the properties of an unexplored Cell to the specified values
+      /// </summary>
       /// <param name="x">X location of the Cell to set properties on, starting with 0 as the farthest left</param>
       /// <param name="y">Y location of the Cell to set properties on, starting with 0 as the top</param>
-      /// <param name="isTransparent">True if line-of-sight is not blocked by this Cell. False otherwise</param>
+      /// <param name="isSightTransparent">True if line-of-sight is not blocked by this Cell. False otherwise</param>
       /// <param name="isWalkable">True if a character could walk across the Cell normally. False otherwise</param>
-      public void SetCellProperties( int x, int y, bool isTransparent, bool isWalkable )
+      public void SetCellProperties( int x, int y, bool isSightTransparent, bool isWalkable )
       {
-         _cells[x, y].IsTransparent = isTransparent;
+         _cells[x, y].IsSightTransparent = isSightTransparent;
          _cells[x, y].IsWalkable = isWalkable;
       }
 
@@ -215,13 +267,13 @@ namespace RogueSharp
       /// <summary>
       /// Sets the properties of all Cells in the Map to the specified values
       /// </summary>
-      /// <param name="isTransparent">Optional parameter defaults to true if not provided. True if line-of-sight is not blocked by this Cell. False otherwise</param>
+      /// <param name="isSightTransparent">Optional parameter defaults to true if not provided. True if line-of-sight is not blocked by this Cell. False otherwise</param>
       /// <param name="isWalkable">Optional parameter defaults to true if not provided. True if a character could walk across the Cell normally. False otherwise</param>
-      public void Clear( bool isTransparent, bool isWalkable )
+      public void Clear( bool isSightTransparent, bool isWalkable )
       {
          foreach ( TCell cell in GetAllCells() )
          {
-            SetCellProperties( cell.X, cell.Y, isTransparent, isWalkable );
+            SetCellProperties( cell.X, cell.Y, isSightTransparent, isWalkable );
          }
       }
 
@@ -238,7 +290,7 @@ namespace RogueSharp
 
          foreach ( TCell cell in GetAllCells() )
          {
-            map.SetCellProperties( cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable );
+            map.SetCellProperties( cell.X, cell.Y, cell.IsSightTransparent, cell.IsWalkable );
          }
          return map;
       }
@@ -277,7 +329,7 @@ namespace RogueSharp
          }
          foreach ( TCell cell in sourceMap.GetAllCells() )
          {
-            SetCellProperties( cell.X + left, cell.Y + top, cell.IsTransparent, cell.IsWalkable );
+            SetCellProperties( cell.X + left, cell.Y + top, cell.IsSightTransparent, cell.IsWalkable );
          }
       }
 
@@ -294,6 +346,19 @@ namespace RogueSharp
                yield return GetCell( x, y );
             }
          }
+      }
+
+      /// <summary>
+      /// Get an IEnumerable of Cells in a line from the Origin Cell to the Destination Cell
+      /// The resulting IEnumerable includes the Origin and Destination Cells
+      /// Uses Bresenham's line algorithm to determine which Cells are in the closest approximation to a straight line between the two Cells
+      /// </summary>
+      /// <param name="origin">Location of the Origin Cell at the start of the line with X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <param name="destination">X location of the Destination Cell at the end of the line with 0 as the farthest left</param>
+      /// <returns>IEnumerable of Cells in a line from the Origin Cell to the Destination Cell which includes the Origin and Destination Cells</returns>
+      public IEnumerable<TCell> GetCellsAlongLine(Point origin, Point destination)
+      {
+         return GetCellsAlongLine( origin.X, origin.Y, destination.X, destination.Y );
       }
 
       /// <summary>
@@ -349,6 +414,18 @@ namespace RogueSharp
       private int ClampY( int y )
       {
          return ( y < 0 ) ? 0 : ( y > Height - 1 ) ? Height - 1 : y;
+      }
+
+      /// <summary>
+      /// Get an IEnumerable of Cells in a circle around the center Cell up to the specified radius using Bresenham's midpoint circle algorithm
+      /// </summary>
+      /// <seealso href="https://en.wikipedia.org/wiki/Midpoint_circle_algorithm">Based on Bresenham's midpoint circle algorithm</seealso>
+      /// <param name="center">Location the Cell to get where X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <param name="radius">The number of Cells to get in a radius from the center Cell</param>
+      /// <returns>IEnumerable of Cells in a circle around the center Cell</returns>
+      public IEnumerable<TCell> GetCellsInCircle(Point center, int radius )
+      {
+         return GetCellsInCircle( center.X, center.Y, radius );
       }
 
       /// <summary>
@@ -414,6 +491,17 @@ namespace RogueSharp
       /// <summary>
       /// Get an IEnumerable of Cells in a diamond (Rhombus) shape around the center Cell up to the specified distance
       /// </summary>
+      /// <param name="center">Location the Cell to get where X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <param name="distance">The number of Cells to get in a distance from the center Cell</param>
+      /// <returns>IEnumerable of Cells in a diamond (Rhombus) shape around the center Cell</returns>
+      public IEnumerable<TCell> GetCellsInDiamond( Point center, int distance )
+      {
+         return GetCellsInDiamond( center.X, center.Y, distance );
+      }
+
+      /// <summary>
+      /// Get an IEnumerable of Cells in a diamond (Rhombus) shape around the center Cell up to the specified distance
+      /// </summary>
       /// <param name="xCenter">X location of the center Cell with 0 as the farthest left</param>
       /// <param name="yCenter">Y location of the center Cell with 0 as the top</param>
       /// <param name="distance">The number of Cells to get in a distance from the center Cell</param>
@@ -449,6 +537,17 @@ namespace RogueSharp
                }
             }
          }
+      }
+
+      /// <summary>
+      /// Get an IEnumerable of Cells in a square area around the center Cell up to the specified distance
+      /// </summary>
+      /// <param name="center">Location the Cell to get where X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <param name="distance">The number of Cells to get in each direction from the center Cell</param>
+      /// <returns>IEnumerable of Cells in a square area around the center Cell</returns>
+      public IEnumerable<TCell> GetCellsInSquare(Point center, int distance)
+      {
+         return GetCellsInSquare( center.X, center.Y, distance );
       }
 
       /// <summary>
@@ -496,6 +595,18 @@ namespace RogueSharp
                yield return GetCell( x, y );
             }
          }
+      }
+
+      /// <summary>
+      /// Get an IEnumerable of outermost border Cells in a circle around the center Cell up to the specified radius using Bresenham's midpoint circle algorithm
+      /// </summary>
+      /// <seealso href="https://en.wikipedia.org/wiki/Midpoint_circle_algorithm">Based on Bresenham's midpoint circle algorithm</seealso>
+      /// <param name="center">Location the Cell to get where X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <param name="radius">The number of Cells to get in a radius from the center Cell</param>
+      /// <returns>IEnumerable of outermost border Cells in a circle around the center Cell</returns>
+      public IEnumerable<TCell> GetBorderCellsInCircle(Point center, int radius )
+      {
+         return GetBorderCellsInCircle( center.X, center.Y, radius );
       }
 
       /// <summary>
@@ -567,6 +678,17 @@ namespace RogueSharp
       /// <summary>
       /// Get an IEnumerable of outermost border Cells in a diamond (Rhombus) shape around the center Cell up to the specified distance
       /// </summary>
+      /// <param name="center">Location the Cell to get where X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <param name="distance">The number of Cells to get in a distance from the center Cell</param>
+      /// <returns>IEnumerable of outermost border Cells in a diamond (Rhombus) shape around the center Cell</returns>
+      public IEnumerable<TCell> GetBorderCellsInDiamond(Point center, int distance )
+      {
+         return GetBorderCellsInDiamond( center.X, center.Y, distance );
+      }
+
+      /// <summary>
+      /// Get an IEnumerable of outermost border Cells in a diamond (Rhombus) shape around the center Cell up to the specified distance
+      /// </summary>
       /// <param name="xCenter">X location of the center Cell with 0 as the farthest left</param>
       /// <param name="yCenter">Y location of the center Cell with 0 as the top</param>
       /// <param name="distance">The number of Cells to get in a distance from the center Cell</param>
@@ -608,6 +730,17 @@ namespace RogueSharp
                yield return cell;
             }
          }
+      }
+
+      /// <summary>
+      /// Get an IEnumerable of outermost border Cells in a square area around the center Cell up to the specified distance
+      /// </summary>
+      /// <param name="center">Location the Cell to get where X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <param name="distance">The number of Cells to get in each direction from the center Cell</param>
+      /// <returns>IEnumerable of outermost border Cells in a square area around the center Cell</returns>
+      public IEnumerable<TCell> GetBorderCellsInSquare( Point center, int distance )
+      {
+         return GetBorderCellsInSquare( center.X, center.Y, distance );
       }
 
       /// <summary>
@@ -677,12 +810,33 @@ namespace RogueSharp
       /// <summary>
       /// Get an IEnumerable of adjacent Cells which touch the center Cell. Diagonal cells do not count as adjacent.
       /// </summary>
+      /// <param name="center">Location the Cell to get where X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <returns>IEnumerable of adjacent Cells which touch the center Cell</returns>
+      public IEnumerable<TCell> GetAdjacentCells( Point center )
+      {
+         return GetAdjacentCells( center.X, center.Y );
+      }
+
+      /// <summary>
+      /// Get an IEnumerable of adjacent Cells which touch the center Cell. Diagonal cells do not count as adjacent.
+      /// </summary>
       /// <param name="xCenter">X location of the center Cell with 0 as the farthest left</param>
       /// <param name="yCenter">Y location of the center Cell with 0 as the top</param>
       /// <returns>IEnumerable of adjacent Cells which touch the center Cell</returns>
       public IEnumerable<TCell> GetAdjacentCells( int xCenter, int yCenter )
       {
          return GetAdjacentCells( xCenter, yCenter, false );
+      }
+
+      /// <summary>
+      /// Get an IEnumerable of adjacent Cells which touch the center Cell. Diagonal cells may optionally be included.
+      /// </summary>
+      /// <param name="center">Location the Cell to get where X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <param name="includeDiagonals">Should diagonal Cells count as being adjacent cells?</param>
+      /// <returns>IEnumerable of adjacent Cells which touch the center Cell</returns>
+      public IEnumerable<TCell> GetAdjacentCells( Point center, bool includeDiagonals )
+      {
+         return GetAdjacentCells( center.X, center.Y, includeDiagonals );
       }
 
       /// <summary>
@@ -746,6 +900,16 @@ namespace RogueSharp
       /// <summary>
       /// Get a Cell at the specified location
       /// </summary>
+      /// <param name="location">Location of the Cell index to get with X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <returns>Cell at the specified location</returns>
+      public TCell GetCell( Point location )
+      {
+         return _cells[location.X, location.Y];
+      }
+
+      /// <summary>
+      /// Get a Cell at the specified location
+      /// </summary>
       /// <param name="x">X location of the Cell to get starting with 0 as the farthest left</param>
       /// <param name="y">Y location of the Cell to get, starting with 0 as the top</param>
       /// <returns>Cell at the specified location</returns>
@@ -795,7 +959,7 @@ namespace RogueSharp
          foreach ( TCell cell in GetAllCells() )
          {
             MapState.CellProperties cellProperties = MapState.CellProperties.None;
-            if ( cell.IsTransparent )
+            if ( cell.IsSightTransparent )
             {
                cellProperties |= MapState.CellProperties.Transparent;
             }
@@ -825,7 +989,7 @@ namespace RogueSharp
          {
             MapState.CellProperties cellProperties = state.Cells[( cell.Y * Width ) + cell.X];
 
-            _cells[cell.X, cell.Y].IsTransparent = cellProperties.HasFlag( MapState.CellProperties.Transparent );
+            _cells[cell.X, cell.Y].IsSightTransparent = cellProperties.HasFlag( MapState.CellProperties.Transparent );
             _cells[cell.X, cell.Y].IsWalkable = cellProperties.HasFlag( MapState.CellProperties.Walkable );
          }
       }
@@ -841,6 +1005,16 @@ namespace RogueSharp
          int y = index / Width;
 
          return GetCell( x, y );
+      }
+
+      /// <summary>
+      /// Get the single dimensional array index for a Cell at the specified location using the formula: index = ( y * Width ) + x
+      /// </summary>
+      /// <param name="location">Location of the Cell index to get with X starting with 0 as the farthest left and Y starting with 0 as the top</param>
+      /// <returns>An index for the Cell at the specified location useful if storing Cells in a single dimensional array</returns>
+      public int IndexFor( Point location )
+      {
+         return ( location.Y * Width ) + location.X;
       }
 
       /// <summary>

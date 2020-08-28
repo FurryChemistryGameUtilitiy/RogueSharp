@@ -117,7 +117,7 @@ namespace RogueSharp
                {
                   break;
                }
-               if ( cell.IsTransparent )
+               if ( cell.IsSightTransparent )
                {
                   _inFov.Add( _map.IndexFor( cell ) );
                }
@@ -214,10 +214,10 @@ namespace RogueSharp
                break;
             }
          }
-         if ( !IsInFov( x, y ) && !_map.IsTransparent( x, y ) )
+         if ( !IsInFov( x, y ) && !_map.IsSightTransparent( x, y ) )
          {
-            if ( ( _map.IsTransparent( x1, y1 ) && IsInFov( x1, y1 ) ) || ( _map.IsTransparent( x2, y2 ) && IsInFov( x2, y2 ) )
-                 || ( _map.IsTransparent( x2, y1 ) && IsInFov( x2, y1 ) ) )
+            if ( ( _map.IsSightTransparent( x1, y1 ) && IsInFov( x1, y1 ) ) || ( _map.IsSightTransparent( x2, y2 ) && IsInFov( x2, y2 ) )
+                 || ( _map.IsSightTransparent( x2, y1 ) && IsInFov( x2, y1 ) ) )
             {
                _inFov.Add( _map.IndexFor( x, y ) );
             }

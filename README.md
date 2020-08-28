@@ -100,7 +100,7 @@ Most interactions with RogueSharp is based around the concept of a `Map` which i
 
 Each `Cell` in a `Map` has the following properties:
 
-- `IsTransparent`: true if visibility extends through the `Cell`.
+- `isSightTransparent`: true if visibility extends through the `Cell`.
 - `IsWalkable`: true if a the `Cell` may be traversed by the player
 - `IsExplored`: true if the player has ever had line-of-sight to the `Cell`
 - `IsInFov`: true if the `Cell` is currently in the player's field-of-view
