@@ -1,4 +1,5 @@
-Modified (https://github.com/FaronBracy/RogueSharp/ "RogueSharp") by (https://github.com/FaronBracy/ "Faron Bracy").
+Modified [RogueSharp](https://github.com/FaronBracy/RogueSharp/ "RogueSharp") by [Faron Bracy](https://github.com/FaronBracy/ "Faron Bracy").
+
 See README.OLD.md
 
 ## Credits ##
