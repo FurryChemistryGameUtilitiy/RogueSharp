@@ -54,3 +54,5 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage( "Performance", "CA1814:Prefer jagged arrays over multidimensional", Justification = "Does not waste space", Scope = "member", Target = "~F:RogueSharp.Map`1._cells" )]
 [assembly: SuppressMessage( "Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "Implement Point accessor", Scope = "member", Target = "~P:RogueSharp.Map`1.Item(RogueSharp.Point)" )]
 [assembly: SuppressMessage( "Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "Implement Point accessor", Scope = "member", Target = "~P:RogueSharp.IMap`1.Item(RogueSharp.Point)" )]
+[assembly: SuppressMessage( "Globalization", "CA1307:Specify StringComparison", Justification = "Not necessary in the given context", Scope = "member", Target = "~M:RogueSharp.DiceNotation.DiceParser.Parse(System.String)~RogueSharp.DiceNotation.DiceExpression" )]
+[assembly: SuppressMessage( "Globalization", "CA1307:Specify StringComparison", Justification = "Not necessary in the given context", Scope = "member", Target = "~M:RogueSharp.MapCreation.StringDeserializeMapCreationStrategy`2.CreateMap~`0" )]

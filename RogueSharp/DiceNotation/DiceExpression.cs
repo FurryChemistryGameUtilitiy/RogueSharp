@@ -15,7 +15,7 @@ namespace RogueSharp.DiceNotation
       /// Construct a new DiceExpression class with an empty list of terms
       /// </summary>
       public DiceExpression()
-         : this( new IDiceExpressionTerm[] { } )
+         : this( System.Array.Empty<IDiceExpressionTerm>() )
       { }
 
       private DiceExpression( IEnumerable<IDiceExpressionTerm> diceTerms )
