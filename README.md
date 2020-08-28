@@ -1,4 +1,4 @@
-Modified [RogueSharp](https://github.com/FaronBracy/RogueSharp/ "RogueSharp") by [Faron Bracy](https://github.com/FaronBracy/ "Faron Bracy").
+Modified [RogueSharp](https://github.com/FaronBracy/RogueSharp/ "RogueSharp") by [Faron Bracy](https://github.com/FaronBracy/ "Faron Bracy") to .NET Core 3.1.
 
 See README.OLD.md
 
